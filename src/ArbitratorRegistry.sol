@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * @dev Whitelist-based system with reputation tracking
  */
 contract ArbitratorRegistry is Ownable {
-    
     struct ArbitratorInfo {
         bool isActive;
         uint256 totalCases;
@@ -21,7 +20,7 @@ contract ArbitratorRegistry is Ownable {
 
     // Mapping from arbitrator address to their info
     mapping(address => ArbitratorInfo) public arbitrators;
-    
+
     // Array of all arbitrator addresses for iteration
     address[] public arbitratorList;
 
@@ -169,7 +168,7 @@ contract ArbitratorRegistry is Ownable {
      */
     function getRandomArbitrator() external view returns (address) {
         uint256 activeCount = 0;
-        
+
         // Count active arbitrators
         for (uint256 i = 0; i < arbitratorList.length; i++) {
             if (arbitrators[arbitratorList[i]].isActive) {
@@ -180,8 +179,9 @@ contract ArbitratorRegistry is Ownable {
         if (activeCount == 0) revert ArbitratorNotActive();
 
         // Simple pseudo-random selection
-        uint256 randomIndex = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender))) % activeCount;
-        
+        uint256 randomIndex =
+            uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao, msg.sender))) % activeCount;
+
         uint256 currentIndex = 0;
         for (uint256 i = 0; i < arbitratorList.length; i++) {
             if (arbitrators[arbitratorList[i]].isActive) {
@@ -222,7 +222,7 @@ contract ArbitratorRegistry is Ownable {
      */
     function getActiveArbitrators() external view returns (address[] memory) {
         uint256 activeCount = 0;
-        
+
         for (uint256 i = 0; i < arbitratorList.length; i++) {
             if (arbitrators[arbitratorList[i]].isActive) {
                 activeCount++;
@@ -260,21 +260,13 @@ contract ArbitratorRegistry is Ownable {
      * @return reputation Current reputation score (0-100)
      * @return feePerCase Fee charged per dispute resolution in wei
      */
-    function getArbitratorInfo(address _arbitrator) external view returns (
-        bool isActive,
-        uint256 totalCases,
-        uint256 resolvedCases,
-        uint256 reputation,
-        uint256 feePerCase
-    ) {
+    function getArbitratorInfo(address _arbitrator)
+        external
+        view
+        returns (bool isActive, uint256 totalCases, uint256 resolvedCases, uint256 reputation, uint256 feePerCase)
+    {
         ArbitratorInfo memory info = arbitrators[_arbitrator];
-        return (
-            info.isActive,
-            info.totalCases,
-            info.resolvedCases,
-            info.reputation,
-            info.feePerCase
-        );
+        return (info.isActive, info.totalCases, info.resolvedCases, info.reputation, info.feePerCase);
     }
 
     /**

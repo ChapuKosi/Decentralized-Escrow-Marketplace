@@ -62,19 +62,13 @@ contract InteractionScript is Script {
 
         vm.startBroadcast(privateKey);
 
-        uint256 amount = 100 * 10**18; // 100 tokens
+        uint256 amount = 100 * 10 ** 18; // 100 tokens
         uint256 deadline = block.timestamp + 7 days;
 
         // Approve factory to spend tokens
         token.approve(address(factory), amount);
 
-        address escrow = factory.createEscrow(
-            seller,
-            address(token),
-            amount,
-            deadline,
-            "Design a logo"
-        );
+        address escrow = factory.createEscrow(seller, address(token), amount, deadline, "Design a logo");
 
         console.log("Token escrow created at:", escrow);
 
@@ -206,7 +200,7 @@ contract InteractionScript is Script {
         console.log("Token:", tokenAddr);
         console.log("Amount:", amount);
         console.log("Deadline:", deadline);
-        console.log("State:", uint(state));
+        console.log("State:", uint256(state));
         console.log("Description:", description);
     }
 
@@ -216,7 +210,7 @@ contract InteractionScript is Script {
     function getAllEscrows() public view {
         address[] memory escrows = factory.getAllEscrows();
         console.log("Total escrows:", escrows.length);
-        for (uint i = 0; i < escrows.length; i++) {
+        for (uint256 i = 0; i < escrows.length; i++) {
             console.log("Escrow", i, ":", escrows[i]);
         }
     }

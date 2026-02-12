@@ -69,20 +69,14 @@ contract EscrowTest is Test {
         assertEq(createdEscrow.seller(), seller);
         assertEq(createdEscrow.amount(), ESCROW_AMOUNT);
         assertEq(address(createdEscrow).balance, ESCROW_AMOUNT);
-        assertEq(uint(createdEscrow.state()), uint(Escrow.State.CREATED));
+        assertEq(uint256(createdEscrow.state()), uint256(Escrow.State.CREATED));
     }
 
     function testCreateERC20Escrow() public {
         vm.startPrank(buyer);
         token.approve(address(factory), ESCROW_AMOUNT);
-        
-        address escrowAddress = factory.createEscrow(
-            seller,
-            address(token),
-            ESCROW_AMOUNT,
-            deadline,
-            "Design a logo"
-        );
+
+        address escrowAddress = factory.createEscrow(seller, address(token), ESCROW_AMOUNT, deadline, "Design a logo");
         vm.stopPrank();
 
         Escrow createdEscrow = Escrow(payable(escrowAddress));
@@ -94,13 +88,8 @@ contract EscrowTest is Test {
     function testAcceptEscrow() public {
         // Create escrow
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -108,19 +97,14 @@ contract EscrowTest is Test {
         vm.prank(seller);
         escrow.acceptEscrow();
 
-        assertEq(uint(escrow.state()), uint(Escrow.State.ACCEPTED));
+        assertEq(uint256(escrow.state()), uint256(Escrow.State.ACCEPTED));
     }
 
     function testCannotAcceptTwice() public {
         // Create and accept
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -135,13 +119,8 @@ contract EscrowTest is Test {
 
     function testOnlySellerCanAccept() public {
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -154,13 +133,8 @@ contract EscrowTest is Test {
     function testReleasePayment() public {
         // Create and accept escrow
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -175,20 +149,15 @@ contract EscrowTest is Test {
         escrow.releasePayment();
 
         // Check state and balance
-        assertEq(uint(escrow.state()), uint(Escrow.State.COMPLETED));
+        assertEq(uint256(escrow.state()), uint256(Escrow.State.COMPLETED));
         assertEq(seller.balance, sellerBalanceBefore + ESCROW_AMOUNT);
     }
 
     function testMarkCompleted() public {
         // Create and accept
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -202,19 +171,14 @@ contract EscrowTest is Test {
         escrow.markCompleted();
 
         // State should still be ACCEPTED
-        assertEq(uint(escrow.state()), uint(Escrow.State.ACCEPTED));
+        assertEq(uint256(escrow.state()), uint256(Escrow.State.ACCEPTED));
     }
 
     function testRaiseDispute() public {
         // Create and accept
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -225,19 +189,14 @@ contract EscrowTest is Test {
         vm.prank(buyer);
         escrow.raiseDispute{value: DISPUTE_FEE}("Work not as described");
 
-        assertEq(uint(escrow.state()), uint(Escrow.State.DISPUTED));
+        assertEq(uint256(escrow.state()), uint256(Escrow.State.DISPUTED));
     }
 
     function testResolveDisputeBuyerWins() public {
         // Create, accept, and dispute
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -257,20 +216,15 @@ contract EscrowTest is Test {
         vm.prank(arbitrator);
         escrow.resolveDispute(Escrow.DisputeOutcome.BUYER_WINS);
 
-        assertEq(uint(escrow.state()), uint(Escrow.State.RESOLVED));
+        assertEq(uint256(escrow.state()), uint256(Escrow.State.RESOLVED));
         assertEq(buyer.balance, buyerBalanceBefore + ESCROW_AMOUNT);
     }
 
     function testResolveDisputeSellerWins() public {
         // Create, accept, and dispute
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -287,20 +241,15 @@ contract EscrowTest is Test {
         vm.prank(arbitrator);
         escrow.resolveDispute(Escrow.DisputeOutcome.SELLER_WINS);
 
-        assertEq(uint(escrow.state()), uint(Escrow.State.RESOLVED));
+        assertEq(uint256(escrow.state()), uint256(Escrow.State.RESOLVED));
         assertEq(seller.balance, sellerBalanceBefore + ESCROW_AMOUNT);
     }
 
     function testResolveDisputeSplit() public {
         // Create, accept, and dispute
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -318,7 +267,7 @@ contract EscrowTest is Test {
         vm.prank(arbitrator);
         escrow.resolveDispute(Escrow.DisputeOutcome.SPLIT);
 
-        assertEq(uint(escrow.state()), uint(Escrow.State.RESOLVED));
+        assertEq(uint256(escrow.state()), uint256(Escrow.State.RESOLVED));
         assertEq(buyer.balance, buyerBalanceBefore + ESCROW_AMOUNT / 2);
         assertEq(seller.balance, sellerBalanceBefore + ESCROW_AMOUNT / 2);
     }
@@ -326,13 +275,8 @@ contract EscrowTest is Test {
     function testCancelEscrow() public {
         // Create escrow
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -342,20 +286,15 @@ contract EscrowTest is Test {
         vm.prank(buyer);
         escrow.cancelEscrow();
 
-        assertEq(uint(escrow.state()), uint(Escrow.State.CANCELLED));
+        assertEq(uint256(escrow.state()), uint256(Escrow.State.CANCELLED));
         assertEq(buyer.balance, buyerBalanceBefore + ESCROW_AMOUNT);
     }
 
     function testCannotCancelAfterAcceptance() public {
         // Create and accept
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -371,13 +310,8 @@ contract EscrowTest is Test {
     function testClaimAfterDeadline() public {
         // Create and accept
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -393,20 +327,15 @@ contract EscrowTest is Test {
         vm.prank(seller);
         escrow.claimAfterDeadline();
 
-        assertEq(uint(escrow.state()), uint(Escrow.State.COMPLETED));
+        assertEq(uint256(escrow.state()), uint256(Escrow.State.COMPLETED));
         assertEq(seller.balance, sellerBalanceBefore + ESCROW_AMOUNT);
     }
 
     function testCannotClaimBeforeGracePeriod() public {
         // Create and accept
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -424,13 +353,8 @@ contract EscrowTest is Test {
 
     function testGetDetails() public {
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -449,19 +373,14 @@ contract EscrowTest is Test {
         assertEq(_token, address(0));
         assertEq(_amount, ESCROW_AMOUNT);
         assertEq(_deadline, deadline);
-        assertEq(uint(_state), uint(Escrow.State.CREATED));
+        assertEq(uint256(_state), uint256(Escrow.State.CREATED));
         assertEq(_description, "Build a website");
     }
 
     function testTimeRemaining() public {
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 
@@ -476,13 +395,8 @@ contract EscrowTest is Test {
 
     function testIsActive() public {
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Build a website"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Build a website");
 
         escrow = Escrow(payable(escrowAddress));
 

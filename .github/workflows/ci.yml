@@ -22,6 +22,9 @@ jobs:
         with:
           version: nightly
 
+      - name: Install dependencies
+        run: forge install
+
       - name: Run Forge build
         run: |
           forge --version
@@ -56,6 +59,9 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
 
+      - name: Install dependencies
+        run: forge install
+
       - name: Generate coverage
         run: forge coverage --report lcov
 
@@ -75,6 +81,9 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install dependencies
+        run: forge install
 
       - name: Check formatting
         run: forge fmt --check

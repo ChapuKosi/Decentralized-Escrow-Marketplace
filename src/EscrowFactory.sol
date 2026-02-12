@@ -68,10 +68,7 @@ contract EscrowFactory is Ownable, Pausable {
      * @param _arbitratorRegistry Address of the arbitrator registry
      * @param _feeRecipient Address to receive platform fees
      */
-    constructor(
-        address _arbitratorRegistry,
-        address _feeRecipient
-    ) Ownable(msg.sender) {
+    constructor(address _arbitratorRegistry, address _feeRecipient) Ownable(msg.sender) {
         if (_arbitratorRegistry == address(0) || _feeRecipient == address(0)) {
             revert InvalidAddress();
         }
@@ -152,15 +149,8 @@ contract EscrowFactory is Ownable, Pausable {
         }
 
         // Deploy new escrow contract
-        Escrow escrow = new Escrow{value: valueToSend}(
-            buyer,
-            _seller,
-            _token,
-            _amount,
-            _deadline,
-            _description,
-            _disputeFee
-        );
+        Escrow escrow =
+            new Escrow{value: valueToSend}(buyer, _seller, _token, _amount, _deadline, _description, _disputeFee);
 
         address escrowAddress = address(escrow);
 
@@ -277,7 +267,7 @@ contract EscrowFactory is Ownable, Pausable {
     function withdrawFees() external onlyOwner {
         uint256 balance = address(this).balance;
         if (balance > 0) {
-            (bool success, ) = feeRecipient.call{value: balance}("");
+            (bool success,) = feeRecipient.call{value: balance}("");
             require(success, "Transfer failed");
             emit FeesWithdrawn(feeRecipient, balance);
         }
@@ -315,7 +305,7 @@ contract EscrowFactory is Ownable, Pausable {
      */
     function getActiveEscrows() external view returns (address[] memory) {
         uint256 activeCount = 0;
-        
+
         // Count active escrows
         for (uint256 i = 0; i < allEscrows.length; i++) {
             if (Escrow(payable(allEscrows[i])).isActive()) {
@@ -351,12 +341,11 @@ contract EscrowFactory is Ownable, Pausable {
      * @return totalFees Total platform fees collected
      * @return activeEscrows Number of currently active escrows
      */
-    function getStatistics() external view returns (
-        uint256 totalEscrows,
-        uint256 totalValue,
-        uint256 totalFees,
-        uint256 activeEscrows
-    ) {
+    function getStatistics()
+        external
+        view
+        returns (uint256 totalEscrows, uint256 totalValue, uint256 totalFees, uint256 activeEscrows)
+    {
         uint256 active = 0;
         for (uint256 i = 0; i < allEscrows.length; i++) {
             if (Escrow(payable(allEscrows[i])).isActive()) {
@@ -364,12 +353,7 @@ contract EscrowFactory is Ownable, Pausable {
             }
         }
 
-        return (
-            totalEscrowsCreated,
-            totalValueLocked,
-            totalFeesCollected,
-            active
-        );
+        return (totalEscrowsCreated, totalValueLocked, totalFeesCollected, active);
     }
 
     // Receive ETH for fees

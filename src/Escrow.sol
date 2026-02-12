@@ -15,20 +15,20 @@ contract Escrow is ReentrancyGuard {
 
     // State machine for escrow lifecycle
     enum State {
-        CREATED,      // Escrow created, waiting for seller acceptance
-        ACCEPTED,     // Seller accepted, work in progress
-        COMPLETED,    // Work completed, funds released to seller
-        DISPUTED,     // Dispute raised, awaiting arbitration
-        RESOLVED,     // Dispute resolved by arbitrator
-        CANCELLED     // Cancelled before acceptance
+        CREATED, // Escrow created, waiting for seller acceptance
+        ACCEPTED, // Seller accepted, work in progress
+        COMPLETED, // Work completed, funds released to seller
+        DISPUTED, // Dispute raised, awaiting arbitration
+        RESOLVED, // Dispute resolved by arbitrator
+        CANCELLED // Cancelled before acceptance
     }
 
     // Dispute resolution outcomes
     enum DisputeOutcome {
         NONE,
-        BUYER_WINS,    // Full refund to buyer
-        SELLER_WINS,   // Full payment to seller
-        SPLIT          // 50/50 split
+        BUYER_WINS, // Full refund to buyer
+        SELLER_WINS, // Full payment to seller
+        SPLIT // 50/50 split
     }
 
     // Core participants
@@ -49,7 +49,7 @@ contract Escrow is ReentrancyGuard {
     // State variables
     State public state;
     DisputeOutcome public disputeOutcome;
-    
+
     // Metadata
     string public description;
     string public disputeReason;
@@ -253,7 +253,7 @@ contract Escrow is ReentrancyGuard {
     function _transferFunds(address to, uint256 _amount) private {
         if (token == address(0)) {
             // Transfer ETH
-            (bool success, ) = to.call{value: _amount}("");
+            (bool success,) = to.call{value: _amount}("");
             if (!success) revert TransferFailed();
         } else {
             // Transfer ERC20
@@ -296,15 +296,19 @@ contract Escrow is ReentrancyGuard {
      * @return _state Current state of the escrow
      * @return _description Work description
      */
-    function getDetails() external view returns (
-        address _buyer,
-        address _seller,
-        address _token,
-        uint256 _amount,
-        uint256 _deadline,
-        State _state,
-        string memory _description
-    ) {
+    function getDetails()
+        external
+        view
+        returns (
+            address _buyer,
+            address _seller,
+            address _token,
+            uint256 _amount,
+            uint256 _deadline,
+            State _state,
+            string memory _description
+        )
+    {
         return (buyer, seller, token, amount, deadline, state, description);
     }
 

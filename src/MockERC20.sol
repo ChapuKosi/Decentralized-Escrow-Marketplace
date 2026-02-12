@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract MockERC20 is ERC20 {
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {
         // Mint 1 million tokens to deployer
-        _mint(msg.sender, 1_000_000 * 10**decimals());
+        _mint(msg.sender, 1_000_000 * 10 ** decimals());
     }
 
     /**

@@ -30,7 +30,7 @@ contract EscrowFactoryTest is Test {
 
         vm.deal(buyer, 10 ether);
         vm.deal(seller, 1 ether);
-        
+
         token.mint(buyer, 1000 ether);
 
         registry.registerArbitrator(arbitrator, 0.01 ether);
@@ -39,13 +39,8 @@ contract EscrowFactoryTest is Test {
 
     function testCreateEscrow() public {
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Test escrow"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Test escrow");
 
         assertTrue(factory.isEscrow(escrowAddress));
         assertEq(factory.getTotalEscrows(), 1);
@@ -53,22 +48,10 @@ contract EscrowFactoryTest is Test {
 
     function testCreateMultipleEscrows() public {
         vm.startPrank(buyer);
-        
-        factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Escrow 1"
-        );
 
-        factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Escrow 2"
-        );
+        factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Escrow 1");
+
+        factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Escrow 2");
 
         vm.stopPrank();
 
@@ -77,13 +60,8 @@ contract EscrowFactoryTest is Test {
 
     function testGetUserEscrows() public {
         vm.prank(buyer);
-        address escrow1 = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Escrow 1"
-        );
+        address escrow1 =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Escrow 1");
 
         address[] memory buyerEscrows = factory.getUserEscrows(buyer);
         address[] memory sellerEscrows = factory.getUserEscrows(seller);
@@ -97,21 +75,10 @@ contract EscrowFactoryTest is Test {
     function testGetActiveEscrows() public {
         // Create multiple escrows
         vm.startPrank(buyer);
-        address escrow1 = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Escrow 1"
-        );
+        address escrow1 =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Escrow 1");
 
-        factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Escrow 2"
-        );
+        factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Escrow 2");
         vm.stopPrank();
 
         // Accept one escrow
@@ -132,13 +99,7 @@ contract EscrowFactoryTest is Test {
         unsupportedToken.approve(address(factory), ESCROW_AMOUNT);
 
         vm.expectRevert(EscrowFactory.TokenNotSupported.selector);
-        factory.createEscrow(
-            seller,
-            address(unsupportedToken),
-            ESCROW_AMOUNT,
-            deadline,
-            "Test"
-        );
+        factory.createEscrow(seller, address(unsupportedToken), ESCROW_AMOUNT, deadline, "Test");
         vm.stopPrank();
     }
 
@@ -175,36 +136,19 @@ contract EscrowFactoryTest is Test {
 
         vm.prank(buyer);
         vm.expectRevert();
-        factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Test"
-        );
+        factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Test");
 
         factory.unpause();
 
         vm.prank(buyer);
-        factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Test"
-        );
+        factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Test");
     }
 
     function testAssignArbitratorToEscrow() public {
         // Create and accept escrow
         vm.prank(buyer);
-        address escrowAddress = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Test"
-        );
+        address escrowAddress =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Test");
 
         vm.prank(seller);
         Escrow(payable(escrowAddress)).acceptEscrow();
@@ -222,25 +166,19 @@ contract EscrowFactoryTest is Test {
     function testCalculateFee() public {
         uint256 amount = 1 ether;
         uint256 feePercent = 250; // 2.5%
-        
+
         factory.setPlatformFee(feePercent);
-        
+
         uint256 amountAfterFee = factory.calculateFee(amount);
         uint256 expectedFee = (amount * feePercent) / 10000;
-        
+
         assertEq(amountAfterFee, amount - expectedFee);
     }
 
     function testWithdrawFees() public {
         // Create escrow to generate some fees
         vm.prank(buyer);
-        factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Test"
-        );
+        factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Test");
 
         // Send some ETH to factory as fees
         vm.deal(address(factory), 1 ether);
@@ -255,28 +193,17 @@ contract EscrowFactoryTest is Test {
     function testGetStatistics() public {
         // Create some escrows
         vm.startPrank(buyer);
-        address escrow1 = factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Escrow 1"
-        );
+        address escrow1 =
+            factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Escrow 1");
 
-        factory.createEscrow{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Escrow 2"
-        );
+        factory.createEscrow{value: ESCROW_AMOUNT}(seller, address(0), ESCROW_AMOUNT, deadline, "Escrow 2");
         vm.stopPrank();
 
         // Accept one
         vm.prank(seller);
         Escrow(payable(escrow1)).acceptEscrow();
 
-        (uint256 totalEscrows, uint256 totalValue, , uint256 activeEscrows) = factory.getStatistics();
+        (uint256 totalEscrows, uint256 totalValue,, uint256 activeEscrows) = factory.getStatistics();
 
         assertEq(totalEscrows, 2);
         assertEq(totalValue, ESCROW_AMOUNT * 2);
@@ -288,12 +215,7 @@ contract EscrowFactoryTest is Test {
 
         vm.prank(buyer);
         address escrowAddress = factory.createEscrowWithCustomFee{value: ESCROW_AMOUNT}(
-            seller,
-            address(0),
-            ESCROW_AMOUNT,
-            deadline,
-            "Test",
-            customFee
+            seller, address(0), ESCROW_AMOUNT, deadline, "Test", customFee
         );
 
         assertEq(Escrow(payable(escrowAddress)).disputeFee(), customFee);
@@ -303,13 +225,7 @@ contract EscrowFactoryTest is Test {
         vm.startPrank(buyer);
         token.approve(address(factory), ESCROW_AMOUNT);
 
-        address escrowAddress = factory.createEscrow(
-            seller,
-            address(token),
-            ESCROW_AMOUNT,
-            deadline,
-            "ERC20 Escrow"
-        );
+        address escrowAddress = factory.createEscrow(seller, address(token), ESCROW_AMOUNT, deadline, "ERC20 Escrow");
         vm.stopPrank();
 
         assertEq(token.balanceOf(escrowAddress), ESCROW_AMOUNT);
