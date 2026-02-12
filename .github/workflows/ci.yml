@@ -1,0 +1,95 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build --sizes
+        id: build
+
+      - name: Run Forge tests
+        run: |
+          forge test -vvv
+        id: test
+
+      - name: Generate gas report
+        run: forge test --gas-report > gas-report.txt
+        id: gas-report
+
+      - name: Upload gas report
+        uses: actions/upload-artifact@v3
+        with:
+          name: gas-report
+          path: gas-report.txt
+
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Generate coverage
+        run: forge coverage --report lcov
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./lcov.info
+          flags: foundry
+
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Check formatting
+        run: forge fmt --check
+
+  security:
+    name: Security Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run Slither
+        uses: crytic/slither-action@v0.3.0
+        continue-on-error: true
+        with:
+          target: 'src/'
+          slither-args: '--filter-paths "lib|test"'
