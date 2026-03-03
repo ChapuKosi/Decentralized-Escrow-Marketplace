@@ -144,6 +144,23 @@ anvil
 forge script script/Deploy.s.sol --rpc-url http://localhost:8545 --broadcast
 ```
 
+### Live Deployment (Sepolia Testnet)
+
+The contracts are deployed and verified on Sepolia testnet:
+
+| Contract | Address | Etherscan |
+|----------|---------|-----------|
+| **ArbitratorRegistry** | `0xA48b6d1657db2A11A1f6247E0C27636bD5eD1D0f` | [View](https://sepolia.etherscan.io/address/0xa48b6d1657db2a11a1f6247e0c27636bd5ed1d0f) |
+| **EscrowFactory** | `0x5B52F51fB270031Fe449f86e6949Aa369565410E` | [View](https://sepolia.etherscan.io/address/0x5b52f51fb270031fe449f86e6949aa369565410e) |
+| **MockUSDC** | `0x5b3DacaeDBFe64857385282764DD6B627114F05f` | [View](https://sepolia.etherscan.io/address/0x5b3dacaedbfe64857385282764dd6b627114f05f) |
+| **MockDAI** | `0x3D0BAD555a7Aa8Eee2fe863985c920c9886F4F95` | [View](https://sepolia.etherscan.io/address/0x3d0bad555a7aa8eee2fe863985c920c9886f4f95) |
+
+**Network:** Sepolia (Chain ID: 11155111)  
+**Total Gas Used:** 5,767,045 gas  
+**Deployment Cost:** 0.00000576710267045 ETH  
+
+All contracts are verified and can be interacted with directly on Etherscan.
+
 ## Repository Structure
 
 ```
@@ -275,9 +292,9 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 
 ## Project Status
 
-**Status:** Portfolio Project - Smart Contracts Complete
+**Status:** Portfolio Project - Deployed on Sepolia Testnet
 
-This is a portfolio project demonstrating smart contract development skills. The contracts are fully functional and tested but have not undergone professional security audits. Not intended for mainnet deployment with real funds.
+This is a portfolio project demonstrating smart contract development skills. The contracts are fully functional, tested, and deployed to Sepolia testnet for demonstration purposes. Contracts have not undergone professional security audits and are not intended for mainnet deployment with real funds.
 
 ## Professional Context
 
@@ -299,7 +316,7 @@ For clarity regarding project scope:
 
 - **Frontend**: No user interface implementation; smart contracts only
 - **Security Audit**: Contracts have not undergone professional third-party security audit
-- **Deployment**: Not deployed to Ethereum mainnet; intended for demonstration purposes
+- **Deployment**: Deployed to Sepolia testnet for demonstration; not intended for mainnet use with real funds
 - **Full-Stack**: Backend smart contracts only; not a complete application
 
 This project specifically focuses on demonstrating smart contract development expertise within the Ethereum ecosystem.
